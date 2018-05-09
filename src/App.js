@@ -124,7 +124,7 @@ class App extends Component {
     }
 
     try {
-      const result = await getMyBottle(this.state.account);
+      const result = await getMyBottle(this.state.network, this.state.account);
       this.setState({ myBottles: result, showHistoryModal: true });
     } catch (error) {
       notification.error({

@@ -4,12 +4,17 @@ body {
   font-family: sans-serif;
 }
 
+#root {
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  top: 0;
+  left: 0;
+}
+
 .App {
   height: 100vh;
   width: 100%;
-  background-image: url(https://cobo.oss-cn-beijing.aliyuncs.com/ocean.jpg);
-  background-size: cover;
-  background-position: center;
 }
 
 .actions {
@@ -30,14 +35,64 @@ body {
 }
 
 .bottle_count {
-  font-size: 30px;
-  padding-left: 40px;
-  padding-top: 40px;
-  color: white;
+  position: absolute;
+  width: 100%;
+  top: 40px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  /* color: #212529; */
+  color: #f8f9fa;
+  font-weight: lighter;
+}
+
+.bottle_count_filter {
+  position: absolute;
+  width: 100%;
+  top: 40px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  /* color: #212529; */
+  color: #adb5bd;
+  font-weight: lighter;
+
+  filter: blur(2px);
 }
 
 .network {
   position: absolute;
-  top: 30px;
-  right: 40px;
+  bottom: 0px;
+  left: 0px;
+  z-index: 999
+}
+
+.ant-select-selection--single {
+  height: 100px;
+  background: transparent;
+  color: white;
+  border: none;
+  line-height: 100px;
+  padding-left: 24px;
+}
+
+.ant-select-selection__rendered {
+  height: 100px;
+  line-height: 100px;
+}
+
+.ant-select-selection-selected-value {
+  font-size: 22px;
+  font-weight: lighter;
+  letter-spacing: 5px;
+}
+
+.ant-modal {
+  top: 250px;
 }

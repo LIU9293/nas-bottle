@@ -1,9 +1,9 @@
 import React from 'react';
 import './index.css';
 
-function ActionButton ({ text, onClick }) {
+function ActionButton ({ text, onClick, style }) {
   return (
-    <div onClick={onClick} className='action_button'>
+    <div onClick={onClick} style={style} className='action_button'>
       {text}
     </div>
   )

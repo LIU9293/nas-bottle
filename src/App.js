@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Collapse, Modal, Input, notification, Select } from 'antd';
 import ActionButton from './components/ActionButton';
+import ButtonContainer from './components/ButtonContainer';
 import {
   getBottleCount,
   throwBottle,
@@ -11,6 +12,7 @@ import {
 import BG_IMG from './assets/ocean.jpg';
 const Panel = Collapse.Panel;
 const Option = Select.Option;
+// const BOTTLE = require('./assets/bottle.png');
 
 class App extends Component {
   state = {
@@ -26,7 +28,8 @@ class App extends Component {
     throwBottleModal: false,
     account: '',
     myMessage: '',
-    network: 'mainnet'
+    network: 'mainnet',
+    loading: false,
   }
 
   async componentDidMount() {
@@ -50,7 +53,7 @@ class App extends Component {
       this.setState({ bottleCount: parseInt(bottleCount, 10) });
     } catch (error) {
       notification.error({
-        message: '网络异常，请检查钱包是不是在' + this.state.network,
+        message: '网络异常，请检查钱包以及是不是在' + this.state.network,
         description: error
       })
       this.setState({ error });
@@ -91,30 +94,35 @@ class App extends Component {
       }, 10000)
       setTimeout(() => {
         this.getBottleCount(this.state.network);
-      }, 10000)
+      }, 20000)
+      setTimeout(() => {
+        this.getBottleCount(this.state.network);
+      }, 30000)
     } catch (error) {
       notification.error({
-        message: '网络异常，请检查钱包是不是在' + this.state.network,
+        message: '失败啦～',
         description: error
       })
       this.setState({ error });
     }
   }
 
-  getBottle = async () => {
+  getBottle = () => {
     try {
-      const result = await getBottle(this.state.network);
-      this.setState({ bottle: result, getBottleVisible: true });
+      this.setState({ getBottleVisible: true, loading: true }, async () => {
+        const result = await getBottle(this.state.network);
+        this.setState({ bottle: result, loading: false });
+      })
     } catch (error) {
       notification.error({
         message: '网络异常，请检查钱包是不是在' + this.state.network,
         description: error
       })
-      this.setState({ error });
+      this.setState({ error, loading: false, getBottleVisible: false });
     }
   }
 
-  getMyBottle = async () => {
+  getMyBottle = () => {
     if (this.state.account === '') {
       notification.error({
         message: '请Unlock浏览器插件账户并刷新页面～',
@@ -124,14 +132,16 @@ class App extends Component {
     }
 
     try {
-      const result = await getMyBottle(this.state.network, this.state.account);
-      this.setState({ myBottles: result, showHistoryModal: true });
+      this.setState({ showHistoryModal: true, loading: true }, async () => {
+        const result = await getMyBottle(this.state.network, this.state.account);
+        this.setState({ myBottles: result, loading: false });
+      })
     } catch (error) {
       notification.error({
         message: '网络异常，请检查钱包是不是在' + this.state.network,
         description: error
       })
-      this.setState({ error });
+      this.setState({ error, loading: false, showHistoryModal: false });
     }
   }
 
@@ -140,15 +150,22 @@ class App extends Component {
     try {
       await pickBottle(this.state.network, hash);
       notification.success({
-        message: '你捡到一个瓶子～'
+        message: '成功啦～',
+        description: '你捡到一个瓶子，请等待链上确认'
       });
       this.hideBottleModal();
       setTimeout(() => {
         this.getBottleCount(this.state.network);
       }, 10000)
+      setTimeout(() => {
+        this.getBottleCount(this.state.network);
+      }, 20000)
+      setTimeout(() => {
+        this.getBottleCount(this.state.network);
+      }, 30000)
     } catch (error) {
       notification.error({
-        message: '网络异常，请检查钱包是不是在' + this.state.network,
+        message: '失败啦～',
         description: error
       })
       this.setState({ error });
@@ -190,46 +207,70 @@ class App extends Component {
   render() {
     return (
       <div className="App" style={{ backgroundImage: BG_IMG }}>
+        <div className="bottle_count_filter">
+          <div className="title">星云链漂流瓶 - Nebulas Bottle</div>
+          <div className="subtitle">{`大海中的瓶子数量：${this.state.bottleCount}`}</div>
+        </div>
 
         <div className="bottle_count">
-          <div className="title">区块链漂流瓶 - Nebulas Dapp</div>
+          <div className="title">星云链漂流瓶 - Nebulas Bottle</div>
           <div className="subtitle">{`大海中的瓶子数量：${this.state.bottleCount}`}</div>
         </div>
 
         <div className="network">
-          <Select defaultValue="mainnet" style={{ width: 120 }} onChange={this.onNetworkChange}>
-            <Option value="mainnet">mainnet</Option>
-            <Option value="testnet">testnet</Option>
+          <Select defaultValue="mainnet" style={{ width: 150 }} onChange={this.onNetworkChange}>
+            <Option value="mainnet">主网</Option>
+            <Option value="testnet">测试网</Option>
           </Select>
         </div>
 
-        <div className="actions">
-          <ActionButton text={'捡一个'} onClick={this.getBottle} />
-          <ActionButton text={'扔一个'} onClick={this.onThrow} />
-          <ActionButton text={'捡到的瓶子'} onClick={this.getMyBottle} />
-        </div>
+        <ButtonContainer>
+          <ActionButton
+            style={{
+              borderLeft: '1px solid rgba(255,255,255,0.1)',
+              borderRight: '1px solid rgba(255,255,255,0.1)'
+            }}
+            text={'捡一个'}
+            onClick={this.getBottle}
+          />
+          <ActionButton
+            text={'扔一个'}
+            onClick={this.onThrow}
+          />
+          <ActionButton
+            style={{
+              borderLeft: '1px solid rgba(255,255,255,0.1)',
+              borderRight: '1px solid rgba(255,255,255,0.1)'
+            }}
+            text={'捡到的瓶子'}
+            onClick={this.getMyBottle}
+          />
+        </ButtonContainer>
 
 
         <Modal
           visible={this.state.showHistoryModal}
           onCancel={this.hideHistoryModal}
-          title={'我捡到的瓶子'}
+          title={this.state.loading ? '加载中...' : '我捡到的瓶子'}
           footer={[
             <Button key="back" onClick={this.hideHistoryModal}>确定</Button>
           ]}
         >
           {
-            this.state.myBottles.length > 0
-              ?<Collapse accordion>
-                {
-                  this.state.myBottles.map((item, index) => (
-                    <Panel header={`from: ${item.owner}`} key={index}>
-                      <p>{item.message}</p>
-                    </Panel>
-                  ))
-                }
-              </Collapse>
-            : <p>还没有捡起瓶子哦～</p>
+            this.state.loading
+            ?  <p></p>
+            :  this.state.myBottles.length > 0
+                ? <Collapse accordion>
+                      {
+                        this.state.myBottles.map((item, index) => (
+                          <Panel header={`from: ${item.owner}`} key={index}>
+                            <p>{item.message}</p>
+                          </Panel>
+                        ))
+                      }
+                    </Collapse>
+                : <p>还没有捡起瓶子哦～</p>
+
           }
         </Modal>
 
@@ -250,7 +291,7 @@ class App extends Component {
         <Modal
           visible={this.state.getBottleVisible}
           onCancel={this.hideBottleModal}
-          title={`来自${this.state.bottle.owner}的漂流瓶`}
+          title={this.state.loading ? '加载中...' : `来自${this.state.bottle.owner}的漂流瓶`}
           footer={[
             <Button key="back" onClick={this.hideBottleModal}>丢回海中</Button>,
             <Button key="submit" type="primary" onClick={this.pickBottle}>
@@ -258,9 +299,13 @@ class App extends Component {
             </Button>
           ]}
         >
-          <div className='bottle_content'>
-            {this.state.bottle.message}
-          </div>
+          {
+            this.state.loading
+            ? <p></p>
+            : <div className='bottle_content'>
+                {this.state.bottle.message}
+              </div>
+          }
         </Modal>
 
         <Modal
@@ -274,7 +319,7 @@ class App extends Component {
             </Button>
           ]}
         >
-          <Input placeholder="区块链漂流瓶" onChange={this.onBottleMessageChange} />
+          <Input placeholder="星云链漂流瓶" onChange={this.onBottleMessageChange} />
         </Modal>
       </div>
     );

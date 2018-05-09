@@ -1,14 +1,18 @@
 .action_button {
-  background: #3b5bdb;
-  border-radius: 4px;
+  background: transparent;
   color: white;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 20px;
-  height: 50px;
-  width: 120px;
+  font-size: 22px;
+  font-weight: lighter;
+  height: 100%;
+  width: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 20px;
+
+  letter-spacing: 5px;
+}
+
+.action_button:hover {
+  background-color: rgba(0, 0, 0, 0.2);
 }

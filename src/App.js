@@ -156,7 +156,7 @@ class App extends Component {
       <div className="App" style={{ backgroundImage: BG_IMG }}>
 
         <div className="bottle_count">
-          <div className="title">区块链漂流瓶</div>
+          <div className="title">区块链漂流瓶 - NAS Testnet</div>
           <div className="subtitle">{`大海中的瓶子数量：${this.state.bottleCount}`}</div>
         </div>
 

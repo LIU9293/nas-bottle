@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Collapse, Modal, Input, notification } from 'antd';
+import { Button, Collapse, Modal, Input, notification, Select } from 'antd';
 import ActionButton from './components/ActionButton';
 import {
   getBottleCount,
@@ -10,6 +10,7 @@ import {
 } from './request';
 import BG_IMG from './assets/ocean.jpg';
 const Panel = Collapse.Panel;
+const Option = Select.Option;
 
 class App extends Component {
   state = {
@@ -24,16 +25,20 @@ class App extends Component {
     noWidget: false,
     throwBottleModal: false,
     account: '',
-    myMessage: ''
+    myMessage: '',
+    network: 'mainnet'
   }
 
   async componentDidMount() {
     window.addEventListener('message', this.getMessage)
 
     try {
-      if (window.webExtensionWallet !== "for nebulas") {
-        this.setState({ noWidget: true })
-      }
+
+      setTimeout(() => {
+        if (!window.webExtensionWallet) {
+          this.setState({ noWidget: true })
+        }
+      }, 5000)
 
       window.postMessage({
           "target": "contentscript",
@@ -41,28 +46,32 @@ class App extends Component {
           "method": "getAccount",
       }, "*");
 
-      const bottleCount = await getBottleCount();
+      const bottleCount = await getBottleCount(this.state.network);
       this.setState({ bottleCount: parseInt(bottleCount, 10) });
     } catch (error) {
-      alert(error);
+      notification.error({
+        message: '网络异常，请检查钱包是不是在' + this.state.network,
+        description: error
+      })
       this.setState({ error });
     }
   }
 
   getMessage = e => {
     if(e.data && e.data.data && e.data.data.account){
-      console.log('*******************');
-      console.log(e.data);
       this.setState({ account: e.data.data.account })
     }
   }
 
   getBottleCount = async () => {
     try {
-      const bottleCount = await getBottleCount();
+      const bottleCount = await getBottleCount(this.state.network);
       this.setState({ bottleCount });
     } catch (error) {
-      alert(error);
+      notification.error({
+        message: '网络异常，请检查钱包是不是在' + this.state.network,
+        description: error
+      })
       this.setState({ error });
     }
   }
@@ -70,7 +79,7 @@ class App extends Component {
   throwBottle = async () => {
     try {
       const { myMessage } = this.state;
-      const res = await throwBottle(myMessage);
+      const res = await throwBottle(this.state.network, myMessage);
       console.log(res);
       this.setState({ myMessage: '', throwBottleModal: false });
       notification.success({
@@ -78,20 +87,29 @@ class App extends Component {
         description: '区块链上的人都有可能捡到它哦！'
       });
       setTimeout(() => {
-        this.getBottleCount();
+        this.getBottleCount(this.state.network);
+      }, 10000)
+      setTimeout(() => {
+        this.getBottleCount(this.state.network);
       }, 10000)
     } catch (error) {
-      alert(error);
+      notification.error({
+        message: '网络异常，请检查钱包是不是在' + this.state.network,
+        description: error
+      })
       this.setState({ error });
     }
   }
 
   getBottle = async () => {
     try {
-      const result = await getBottle();
+      const result = await getBottle(this.state.network);
       this.setState({ bottle: result, getBottleVisible: true });
     } catch (error) {
-      alert(error);
+      notification.error({
+        message: '网络异常，请检查钱包是不是在' + this.state.network,
+        description: error
+      })
       this.setState({ error });
     }
   }
@@ -109,7 +127,10 @@ class App extends Component {
       const result = await getMyBottle(this.state.account);
       this.setState({ myBottles: result, showHistoryModal: true });
     } catch (error) {
-      alert(error);
+      notification.error({
+        message: '网络异常，请检查钱包是不是在' + this.state.network,
+        description: error
+      })
       this.setState({ error });
     }
   }
@@ -117,16 +138,19 @@ class App extends Component {
   pickBottle = async () => {
     const { hash } = this.state.bottle;
     try {
-      await pickBottle(hash);
+      await pickBottle(this.state.network, hash);
       notification.success({
         message: '你捡到一个瓶子～'
       });
       this.hideBottleModal();
       setTimeout(() => {
-        this.getBottleCount();
+        this.getBottleCount(this.state.network);
       }, 10000)
     } catch (error) {
-      alert(error);
+      notification.error({
+        message: '网络异常，请检查钱包是不是在' + this.state.network,
+        description: error
+      })
       this.setState({ error });
     }
   }
@@ -157,13 +181,26 @@ class App extends Component {
     this.setState({ throwBottleModal: false })
   }
 
+  onNetworkChange = network => {
+    this.setState({ network }, () => {
+      this.getBottleCount()
+    });
+  }
+
   render() {
     return (
       <div className="App" style={{ backgroundImage: BG_IMG }}>
 
         <div className="bottle_count">
-          <div className="title">区块链漂流瓶 - NAS Testnet</div>
+          <div className="title">区块链漂流瓶 - Nebulas Dapp</div>
           <div className="subtitle">{`大海中的瓶子数量：${this.state.bottleCount}`}</div>
+        </div>
+
+        <div className="network">
+          <Select defaultValue="mainnet" style={{ width: 120 }} onChange={this.onNetworkChange}>
+            <Option value="mainnet">mainnet</Option>
+            <Option value="testnet">testnet</Option>
+          </Select>
         </div>
 
         <div className="actions">
@@ -199,9 +236,9 @@ class App extends Component {
         <Modal
           title={'安装插件'}
           visible={this.state.noWidget}
-          onCanel={this.hideNoWidgetModal}
+          onCancel={this.hideNoWidgetModal}
           footer={[
-            <Button key="back" onClick={this.hideHistoryModal}>取消</Button>
+            <Button key="back" onClick={this.hideNoWidgetModal}>取消</Button>
           ]}
         >
           <div>

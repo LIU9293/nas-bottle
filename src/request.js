@@ -1,11 +1,11 @@
-import { testnet } from './constants';
+import { testnet, mainnet } from './constants';
 const NebPay = require('nebPay/nebpay.js');
 
 const neb = new NebPay();
 
-export const simulateFunction = (name, args) => {
+export const simulateFunction = (network = 'mainnet', name, args) => {
   return new Promise((resolve, reject) => {
-    neb.simulateCall(testnet.contract, '0', name, JSON.stringify(args), {
+    neb.simulateCall(network === 'mainnet' ? mainnet.contract : testnet.contract, '0', name, JSON.stringify(args), {
         listener: function(res) {
           if (res.execute_err !== '') {
             reject(res.execute_err);
@@ -21,9 +21,9 @@ export const simulateFunction = (name, args) => {
   });
 }
 
-export const callFunction = (name, args) => {
+export const callFunction = (network = 'mainnet', name, args) => {
   return new Promise((resolve, reject) => {
-    neb.call(testnet.contract, '0', name, JSON.stringify(args), {
+    neb.call(network === 'mainnet' ? mainnet.contract : testnet.contract, '0', name, JSON.stringify(args), {
         listener: function(res) {
           if (typeof res === 'string' && res.indexOf('Error:') >= 0) {
             reject(res);
@@ -39,12 +39,12 @@ export const callFunction = (name, args) => {
   });
 }
 
-export const getBottleCount = () => simulateFunction('getBottleCount')
+export const getBottleCount = network => simulateFunction(network, 'getBottleCount')
 
-export const throwBottle = message => callFunction('throwBottle', [message])
+export const throwBottle = (network, message) => callFunction(network, 'throwBottle', [message])
 
-export const getBottle = () => simulateFunction('getBottle')
+export const getBottle = network => simulateFunction(network, 'getBottle')
 
-export const getMyBottle = address => simulateFunction('getMyBottle', [address])
+export const getMyBottle = (network, address) => simulateFunction(network, 'getMyBottle', [address])
 
-export const pickBottle = hash => callFunction('delBottle', [hash])
+export const pickBottle = (network, hash) => callFunction(network, 'delBottle', [hash])

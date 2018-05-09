@@ -77,6 +77,9 @@ class App extends Component {
         message: '瓶子成功丢进大海～',
         description: '区块链上的人都有可能捡到它哦！'
       });
+      setTimeout(() => {
+        this.getBottleCount();
+      }, 10000)
     } catch (error) {
       alert(error);
       this.setState({ error });
@@ -119,6 +122,9 @@ class App extends Component {
         message: '你捡到一个瓶子～'
       });
       this.hideBottleModal();
+      setTimeout(() => {
+        this.getBottleCount();
+      }, 10000)
     } catch (error) {
       alert(error);
       this.setState({ error });
@@ -163,7 +169,7 @@ class App extends Component {
         <div className="actions">
           <ActionButton text={'捡一个'} onClick={this.getBottle} />
           <ActionButton text={'扔一个'} onClick={this.onThrow} />
-          <ActionButton text={'我的瓶子'} onClick={this.getMyBottle} />
+          <ActionButton text={'捡到的瓶子'} onClick={this.getMyBottle} />
         </div>
 
 

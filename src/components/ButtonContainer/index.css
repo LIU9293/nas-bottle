@@ -9,3 +9,9 @@
   height: 100px;
   width: 100%;
 }
+
+@media (max-width: 768px) {
+  .gray_layer {
+    height: 60px;
+  }
+}

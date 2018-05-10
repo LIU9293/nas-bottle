@@ -37,7 +37,7 @@ body {
 .bottle_count {
   position: absolute;
   width: 100%;
-  top: 40px;
+  top: 10%;
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -52,7 +52,7 @@ body {
 .bottle_count_filter {
   position: absolute;
   width: 100%;
-  top: 40px;
+  top: 10%;
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -64,6 +64,15 @@ body {
   font-weight: lighter;
 
   filter: blur(2px);
+}
+
+@media (max-width: 768px) {
+  .bottle_count {
+    font-size: 26px;
+  }
+  .bottle_count_filter {
+    font-size: 26px;
+  }
 }
 
 .network {
@@ -94,5 +103,14 @@ body {
 }
 
 .ant-modal {
-  top: 250px;
+  top: 36%;
+}
+
+@media (max-width: 768px) {
+  .ant-modal {
+    top: 30%;
+  }
+  .ant-select-selection--single {
+    display: none;
+  }
 }

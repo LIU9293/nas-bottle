@@ -36,12 +36,11 @@ class App extends Component {
     window.addEventListener('message', this.getMessage)
 
     try {
-
       setTimeout(() => {
         if (!window.webExtensionWallet) {
           this.setState({ noWidget: true })
         }
-      }, 5000)
+      }, 10000)
 
       window.postMessage({
           "target": "contentscript",
@@ -82,6 +81,21 @@ class App extends Component {
   throwBottle = async () => {
     try {
       const { myMessage } = this.state;
+      if (!myMessage || myMessage === '') {
+        notification.error({
+          message: '说点什么？'
+        });
+        return
+      }
+
+      if (!window.webExtensionWallet) {
+        notification.error({
+          message: '请安装浏览器插件并刷新页面～',
+          description: 'https://github.com/ChengOrangeJu/WebExtensionWallet'
+        })
+        return
+      }
+
       const res = await throwBottle(this.state.network, myMessage);
       console.log(res);
       this.setState({ myMessage: '', throwBottleModal: false });
@@ -124,6 +138,13 @@ class App extends Component {
 
   getMyBottle = () => {
     if (this.state.account === '') {
+      if (!window.webExtensionWallet) {
+        notification.error({
+          message: '请安装浏览器插件并刷新页面～',
+          description: 'https://github.com/ChengOrangeJu/WebExtensionWallet'
+        })
+        return
+      }
       notification.error({
         message: '请Unlock浏览器插件账户并刷新页面～',
         description: ''
@@ -283,8 +304,12 @@ class App extends Component {
           ]}
         >
           <div>
-            你还没有安装 NAS Chrome 插件。
-            请点击<a href={'https://github.com/ChengOrangeJu/WebExtensionWallet'}>https://github.com/ChengOrangeJu/WebExtensionWallet</a>安装
+            <p>
+              你还没有安装 NAS Chrome 插件，还不能扔瓶子或者捡瓶子哦～
+            </p>
+            <p>
+              请点击<a href={'https://github.com/ChengOrangeJu/WebExtensionWallet'}>https://github.com/ChengOrangeJu/WebExtensionWallet</a>安装
+            </p>
           </div>
         </Modal>
 

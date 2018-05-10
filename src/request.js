@@ -39,12 +39,46 @@ export const callFunction = (network = 'mainnet', name, args) => {
   });
 }
 
-export const getBottleCount = network => simulateFunction(network, 'getBottleCount')
+export const callFunctionUsePublicAddress = (network = 'mainnet', name, args) => {
+  return new Promise((resolve, reject) => {
+    const url = network === 'mainnet' ? mainnet.url : testnet.url;
+    const contract = network === 'mainnet' ? mainnet.contract : testnet.contract;
+    const requestObj = {
+      from: 'n1Mzkyry3wCL9BLQtaBKeikWYWdKGDzmSDX',
+      to: contract,
+      value: '0',
+      nonce: 1,
+      gasPrice: '1000000',
+      gasLimit: '2000000',
+      contract: {
+        function: name,
+        args: JSON.stringify(args)
+      }
+    }
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestObj)
+    })
+    .then(res => res.json())
+    .then(res => {
+      console.log(res.result)
+      resolve(JSON.parse(res.result.result))
+    })
+    .catch(err => {
+      reject(err)
+    })
+  });
+}
+
+export const getBottleCount = network => callFunctionUsePublicAddress(network, 'getBottleCount')
 
 export const throwBottle = (network, message) => callFunction(network, 'throwBottle', [message])
 
-export const getBottle = network => simulateFunction(network, 'getBottle')
+export const getBottle = network => callFunctionUsePublicAddress(network, 'getBottle')
 
-export const getMyBottle = (network, address) => simulateFunction(network, 'getMyBottle', [address])
+export const getMyBottle = (network, address) => callFunctionUsePublicAddress(network, 'getMyBottle', [address])
 
 export const pickBottle = (network, hash) => callFunction(network, 'delBottle', [hash])

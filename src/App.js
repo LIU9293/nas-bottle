@@ -14,6 +14,21 @@ const Panel = Collapse.Panel;
 const Option = Select.Option;
 // const BOTTLE = require('./assets/bottle.png');
 
+const isIOS = () => {
+  if (typeof window === 'undefined' || !window.navigator.userAgent) {
+    return false;
+  }
+  return /(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent);
+};
+
+const isAndroid = () => {
+  if (typeof window === 'undefined' || !window.navigator.userAgent) {
+    return false;
+  }
+  return /(Android)/i.test(navigator.userAgent);
+};
+
+
 class App extends Component {
   state = {
     error: null,
@@ -86,6 +101,13 @@ class App extends Component {
           message: '说点什么？'
         });
         return
+      }
+
+      if (isIOS() || isAndroid()) {
+        notification.error({
+          message: '请用桌面Chrome安装星云链插件使用',
+        })
+        return;
       }
 
       if (!window.webExtensionWallet) {
@@ -169,6 +191,13 @@ class App extends Component {
   pickBottle = async () => {
     const { hash } = this.state.bottle;
     try {
+      if (isIOS() || isAndroid()) {
+        notification.error({
+          message: '请用桌面Chrome安装星云链插件使用',
+        })
+        return;
+      }
+
       await pickBottle(this.state.network, hash);
       notification.success({
         message: '成功啦～',
